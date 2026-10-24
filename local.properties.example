@@ -1,0 +1,7 @@
+## Copy this file to local.properties and fill in values.
+## local.properties is gitignored and must not be committed.
+
+sdk.dir=C\:\\Users\\YOUR_USER\\AppData\\Local\\Android\\Sdk
+
+# Get a key at https://developer.tech.yandex.ru/
+YANDEX_MAPKIT_API_KEY=your_yandex_mapkit_api_key_here

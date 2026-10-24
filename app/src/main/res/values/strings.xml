@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">on-the-go</string>
+    <string name="trip_notification_channel">Активная поездка</string>
+    <string name="alert_notification_channel">Оповещения точек</string>
+    <string name="alarm_notification_channel">Будильник точек</string>
+    <string name="trip_active_title">Поездка активна</string>
+    <string name="trip_active_text">Точек в маршруте: %1$d</string>
+    <string name="point_reached_title">Точка рядом</string>
+    <string name="stop_trip">Стоп</string>
+    <string name="snooze">Отложить</string>
+    <string name="dismiss">Стоп</string>
+    <string name="disable_point">Убрать точку</string>
+</resources>

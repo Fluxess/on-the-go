@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>on-the-go — открыть точки</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #111; color: #f4f4f6; margin: 0; padding: 32px 20px; text-align: center; }
+    a.btn { display: inline-block; margin-top: 20px; padding: 14px 22px; border-radius: 14px; background: #2F6BFF; color: #fff; text-decoration: none; font-weight: 600; }
+    p { opacity: .8; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <h1>on-the-go</h1>
+  <p id="status">Открываем приложение…</p>
+  <a class="btn" id="open" href="#">Открыть в on-the-go</a>
+  <p style="margin-top:24px;font-size:14px">Если приложение не установлено — скачайте on-the-go в RuStore.</p>
+  <script>
+    (function () {
+      var d = new URLSearchParams(location.search).get('d');
+      if (!d) {
+        document.getElementById('status').textContent = 'В ссылке нет данных точек.';
+        document.getElementById('open').hidden = true;
+        return;
+      }
+      var app = 'onthego://import?d=' + encodeURIComponent(d);
+      var a = document.getElementById('open');
+      a.href = app;
+      // Try auto-open (works in many in-app browsers).
+      window.location.replace(app);
+      setTimeout(function () {
+        document.getElementById('status').textContent = 'Нажмите кнопку, если приложение не открылось.';
+      }, 600);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Clean alarm bell icon for the alarm screen -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <!-- Bell body -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M48,8 C47,8 46,8.4 45.2,9.2 C43.5,9.7 42,10.6 40.6,11.9
+            C35.5,16.5 32,24.2 32,33 L32,54 L24,62 L24,66 L72,66 L72,62 L64,54 L64,33
+            C64,24.2 60.5,16.5 55.4,11.9 C54,10.6 52.5,9.7 50.8,9.2 C50,8.4 49,8 48,8 Z" />
+    <!-- Bell clapper / dot -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M42,68 C42,74.6 44.7,80 48,80 C51.3,80 54,74.6 54,68 Z" />
+</vector>
