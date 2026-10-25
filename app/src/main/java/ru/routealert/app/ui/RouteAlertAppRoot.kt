@@ -128,6 +128,8 @@ fun RouteAlertAppRoot(
                 ) {
                     PointsListScreen(
                         points = uiState.points,
+                        subscriptionState = uiState.subscriptionState,
+                        onOpenPaywall = onOpenPaywall,
                         onOpen = {
                             onSelectPoint(it)
                         },

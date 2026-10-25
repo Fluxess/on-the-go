@@ -27,7 +27,7 @@ private val Context.subscriptionDataStore by preferencesDataStore("route_alert_s
  */
 class SubscriptionManager(
     private val context: Context,
-    val billingProvider: BillingProvider = MockBillingProvider()
+    var billingProvider: BillingProvider = RuStoreBillingProvider(context)
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -92,6 +92,7 @@ class SubscriptionManager(
                 status = SubscriptionStatus.TrialActive(daysLeft, endsAt),
                 isProUnlocked = true
             )
+            TrialReminderWorker.scheduleIfRequired(context, trialStart)
         } else {
             _subscriptionState.value = SubscriptionState(
                 status = SubscriptionStatus.ExpiredFree,
@@ -110,6 +111,7 @@ class SubscriptionManager(
             status = SubscriptionStatus.ProPurchased(plan.id, now),
             isProUnlocked = true
         )
+        TrialReminderWorker.cancel(context)
     }
 
     suspend fun setProDirectly(enabled: Boolean) {
@@ -149,6 +151,7 @@ class SubscriptionManager(
             status = SubscriptionStatus.TrialActive(daysLeft = TRIAL_DAYS, endsAtTimestampMs = now + TRIAL_DURATION_MS),
             isProUnlocked = true
         )
+        TrialReminderWorker.scheduleIfRequired(context, now)
     }
 
     @SuppressLint("HardwareIds")

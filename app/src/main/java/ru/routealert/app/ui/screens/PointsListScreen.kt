@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import ru.routealert.app.alert.NotificationHelper
 import ru.routealert.app.data.AlertType
 import ru.routealert.app.data.RoutePoint
+import ru.routealert.app.subscription.SubscriptionState
+import ru.routealert.app.subscription.SubscriptionStatus
 import ru.routealert.app.ui.theme.Glass
 import ru.routealert.app.ui.theme.GlassBlue
 import ru.routealert.app.ui.theme.LiquidGlassPanel
@@ -32,6 +34,8 @@ import ru.routealert.app.ui.theme.LiquidGlassPanel
 @Composable
 fun PointsListScreen(
     points: List<RoutePoint>,
+    subscriptionState: SubscriptionState? = null,
+    onOpenPaywall: () -> Unit = {},
     onOpen: (RoutePoint) -> Unit,
     onToggle: (RoutePoint, Boolean) -> Unit,
     onDelete: (RoutePoint) -> Unit,
@@ -68,6 +72,71 @@ fun PointsListScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White.copy(alpha = 0.72f)
                 )
+
+                if (subscriptionState != null) {
+                    when (val s = subscriptionState.status) {
+                        is SubscriptionStatus.TrialActive -> {
+                            LiquidGlassPanel(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .clickable(onClick = onOpenPaywall),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = listOf(Color(0x332F6BFF), Color(0x112F6BFF))
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "★ Пробный период Pro: осталось ${s.daysLeft} дн.",
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        text = "Тарифы →",
+                                        color = Color(0xFF81D4FA),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                            }
+                        }
+                        is SubscriptionStatus.ExpiredFree -> {
+                            LiquidGlassPanel(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .clickable(onClick = onOpenPaywall),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = listOf(Color(0x33E10600), Color(0x11E10600))
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Будильник в дороге доступен в Pro",
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        text = "Включить →",
+                                        color = Color(0xFFFFB4AB),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                            }
+                        }
+                        is SubscriptionStatus.ProPurchased -> Unit
+                    }
+                }
+
                 TextButton(onClick = onShare) {
                     Text("Поделиться · Pro", color = GlassBlue)
                 }

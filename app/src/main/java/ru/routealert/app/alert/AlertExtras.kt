@@ -14,9 +14,11 @@ object AlertExtras {
     const val CHANNEL_TRIP = "trip_tracking"
     const val CHANNEL_ALERT = "point_alerts"
     const val CHANNEL_ALARM = "point_alarms"
+    const val CHANNEL_TRIAL = "trial_reminders"
 
     const val NOTIFICATION_ID_TRIP = 1001
     const val NOTIFICATION_ID_ALERT_BASE = 2000
+    const val NOTIFICATION_ID_TRIAL_REMINDER = 3001
 
     const val SNOOZE_MINUTES = 2
 }

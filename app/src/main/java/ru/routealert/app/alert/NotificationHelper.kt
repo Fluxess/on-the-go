@@ -54,7 +54,16 @@ class NotificationHelper(private val context: Context) {
             setSound(null, null)
         }
 
-        manager.createNotificationChannels(listOf(trip, alert, alarm))
+        val trial = NotificationChannel(
+            AlertExtras.CHANNEL_TRIAL,
+            "Напоминания о подписке",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Напоминания об окончании бесплатного периода Pro"
+            setShowBadge(true)
+        }
+
+        manager.createNotificationChannels(listOf(trip, alert, alarm, trial))
     }
 
     fun buildTripNotification(
@@ -218,6 +227,29 @@ class NotificationHelper(private val context: Context) {
 
         NotificationManagerCompat.from(context)
             .notify(AlertExtras.NOTIFICATION_ID_ALERT_BASE + point.id.toInt(), builder.build())
+    }
+
+    fun showTrialReminderNotification(daysLeft: Int) {
+        val openApp = PendingIntent.getActivity(
+            context,
+            3001,
+            Intent(context, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val text = "Осталось $daysLeft дн. полного доступа. Не забудьте выбрать удобный тариф, чтобы будильник в дороге остался активным."
+        val notification = NotificationCompat.Builder(context, AlertExtras.CHANNEL_TRIAL)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Бесплатный период on-the-go Pro")
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(openApp)
+            .build()
+
+        NotificationManagerCompat.from(context)
+            .notify(AlertExtras.NOTIFICATION_ID_TRIAL_REMINDER, notification)
     }
 
     fun cancelPointNotification(pointId: Long) {
