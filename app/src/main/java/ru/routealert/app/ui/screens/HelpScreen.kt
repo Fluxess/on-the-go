@@ -2,6 +2,7 @@ package ru.routealert.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,7 +70,12 @@ fun HelpScreen(
 
         GlassSection(title = "Тема") {
             HelpLine("Меняет оформление экрана помощи и стиль карты (светлая / тёмная).")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 LiquidGlassChip("Как в системе", themeMode == ThemeMode.SYSTEM) {
                     onThemeMode(ThemeMode.SYSTEM)
                 }
@@ -87,7 +93,12 @@ fun HelpScreen(
                 "Pro: шаринг точек ссылкой и QR (родители/дети). " +
                     "Поиск адреса и live-уведомление в поездке доступны всем."
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 LiquidGlassChip("Pro вкл", isPro) { onSetPro(true) }
                 LiquidGlassChip("Pro выкл", !isPro) { onSetPro(false) }
             }

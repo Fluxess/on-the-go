@@ -1,6 +1,7 @@
 package ru.routealert.app.ui.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -108,7 +109,12 @@ fun PointEditorSheet(
                     inactiveTrackColor = Color.White.copy(alpha = 0.22f)
                 )
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 listOf(50f, 200f, 500f, 1000f).forEach { preset ->
                     LiquidGlassChip(
                         label = NotificationHelper.formatDistance(preset),
@@ -120,7 +126,12 @@ fun PointEditorSheet(
             Spacer(modifier = Modifier.height(16.dp))
             Text("Тип оповещения", style = MaterialTheme.typography.bodyLarge, color = Color.White)
             Spacer(modifier = Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 LiquidGlassChip("Уведомление", draft.alertType == AlertType.NOTIFICATION) {
                     onDraftChange { it.copy(alertType = AlertType.NOTIFICATION) }
                 }

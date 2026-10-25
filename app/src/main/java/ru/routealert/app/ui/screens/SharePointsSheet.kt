@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.routealert.app.data.RoutePoint
 import ru.routealert.app.share.PointShare
@@ -88,7 +90,10 @@ fun SharePointsSheet(
                 ) {
                     Text(
                         "Функция доступна в Pro. Включите Pro в разделе «Помощь» для теста.",
-                        modifier = Modifier.padding(14.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
+                        textAlign = TextAlign.Center,
                         color = Color.White.copy(alpha = 0.9f)
                     )
                 }
@@ -98,7 +103,11 @@ fun SharePointsSheet(
             }
 
             if (enabled.isEmpty()) {
-                Text("Нет сохранённых точек для шаринга", color = Color.White.copy(alpha = 0.8f))
+                Text(
+                    "Нет сохранённых точек для шаринга",
+                    textAlign = TextAlign.Center,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
                 Spacer(Modifier.height(14.dp))
                 LiquidGlassChip("Закрыть", selected = false, onClick = onDismiss)
                 return@Column
@@ -119,6 +128,7 @@ fun SharePointsSheet(
             Spacer(Modifier.height(10.dp))
             Text(
                 "${enabled.size} точ. · ${enabled.joinToString { it.name }}",
+                textAlign = TextAlign.Center,
                 color = Color.White.copy(alpha = 0.82f),
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -126,8 +136,11 @@ fun SharePointsSheet(
 
             // Action buttons row
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 LiquidGlassChip("Поделиться", selected = false) {
                     val shareText = PointShare.toShareText(enabled)

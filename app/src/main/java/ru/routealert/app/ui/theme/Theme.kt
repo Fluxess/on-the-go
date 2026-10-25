@@ -16,6 +16,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -55,48 +58,61 @@ private val DarkColors = darkColorScheme(
     onError = Color.White
 )
 
+private val BalancedLineBreak = LineBreak(
+    strategy = LineBreak.Strategy.Balanced,
+    strictness = LineBreak.Strictness.Normal,
+    wordBreak = LineBreak.WordBreak.Default
+)
+
 private val AppTypography = Typography(
     headlineLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.SemiBold,
         fontSize = 32.sp,
         letterSpacing = (-0.5).sp,
-        lineBreak = androidx.compose.ui.text.style.LineBreak.Heading
+        lineBreak = BalancedLineBreak,
+        hyphens = Hyphens.None
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.SemiBold,
         fontSize = 26.sp,
         letterSpacing = (-0.3).sp,
-        lineBreak = androidx.compose.ui.text.style.LineBreak.Heading
+        lineBreak = BalancedLineBreak,
+        hyphens = Hyphens.None
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
-        lineBreak = androidx.compose.ui.text.style.LineBreak.Heading
+        lineBreak = BalancedLineBreak,
+        hyphens = Hyphens.None
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        lineBreak = androidx.compose.ui.text.style.LineBreak.Heading
+        lineBreak = BalancedLineBreak,
+        hyphens = Hyphens.None
     ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontSize = 16.sp,
-        lineBreak = androidx.compose.ui.text.style.LineBreak.Paragraph
+        lineBreak = BalancedLineBreak,
+        hyphens = Hyphens.None
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontSize = 14.sp,
-        lineBreak = androidx.compose.ui.text.style.LineBreak.Paragraph
+        lineBreak = BalancedLineBreak,
+        hyphens = Hyphens.None
     ),
     labelLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
         fontSize = 13.sp,
-        lineBreak = androidx.compose.ui.text.style.LineBreak.Simple
+        lineBreak = BalancedLineBreak,
+        hyphens = Hyphens.None
     )
 )
 
