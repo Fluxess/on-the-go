@@ -32,10 +32,13 @@ import ru.routealert.app.data.LegalDocs
 import ru.routealert.app.data.RoutePoint
 import ru.routealert.app.data.ThemeMode
 import ru.routealert.app.location.PlaceHit
+import ru.routealert.app.subscription.BillingProvider
+import ru.routealert.app.subscription.SubscriptionPlan
 import ru.routealert.app.ui.screens.AboutScreen
 import ru.routealert.app.ui.screens.HelpScreen
 import ru.routealert.app.ui.screens.LegalDocSheet
 import ru.routealert.app.ui.screens.MapScreen
+import ru.routealert.app.ui.screens.PaywallSheet
 import ru.routealert.app.ui.screens.PointEditorSheet
 import ru.routealert.app.ui.screens.PointsListScreen
 import ru.routealert.app.ui.screens.SearchPlaceSheet
@@ -71,6 +74,11 @@ fun RouteAlertAppRoot(
     onFocusDraftOnMap: () -> Unit,
     onOpenShare: () -> Unit,
     onCloseShare: () -> Unit,
+    onOpenPaywall: () -> Unit = {},
+    onClosePaywall: () -> Unit = {},
+    billingProvider: BillingProvider? = null,
+    onPurchaseSuccess: (SubscriptionPlan) -> Unit = {},
+    onResetTrial: () -> Unit = {},
     onSetPro: (Boolean) -> Unit,
     onClearImportMessage: () -> Unit,
     onImportText: (String) -> Unit = {}
@@ -135,8 +143,11 @@ fun RouteAlertAppRoot(
                 permissions = uiState.permissions,
                 themeMode = uiState.themeMode,
                 isPro = uiState.isPro,
+                subscriptionState = uiState.subscriptionState,
                 onThemeMode = onThemeMode,
                 onSetPro = onSetPro,
+                onOpenPaywall = onOpenPaywall,
+                onResetTrial = onResetTrial,
                 onOpenAppSettings = onOpenAppSettings,
                 onOpenBatterySettings = onOpenBatterySettings,
                 onOpenLocationSettings = onOpenLocationSettings,
@@ -180,6 +191,8 @@ fun RouteAlertAppRoot(
     uiState.draft?.let { draft ->
         PointEditorSheet(
             draft = draft,
+            isPro = uiState.isPro,
+            onOpenPaywall = onOpenPaywall,
             onDraftChange = onDraftChange,
             onSave = onSavePoint,
             onDelete = {
@@ -210,8 +223,18 @@ fun RouteAlertAppRoot(
         SharePointsSheet(
             points = uiState.points,
             isPro = uiState.isPro,
+            onOpenPaywall = onOpenPaywall,
             onImportFromText = onImportText,
             onDismiss = onCloseShare
+        )
+    }
+
+    if (uiState.showPaywall && billingProvider != null) {
+        PaywallSheet(
+            subscriptionState = uiState.subscriptionState,
+            billingProvider = billingProvider,
+            onSuccessPurchase = onPurchaseSuccess,
+            onDismiss = onClosePaywall
         )
     }
 

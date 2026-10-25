@@ -41,6 +41,8 @@ import kotlin.math.roundToInt
 @Composable
 fun PointEditorSheet(
     draft: PointDraft,
+    isPro: Boolean = true,
+    onOpenPaywall: () -> Unit = {},
     onDraftChange: ((PointDraft) -> PointDraft) -> Unit,
     onSave: () -> Unit,
     onDelete: () -> Unit,
@@ -135,11 +137,25 @@ fun PointEditorSheet(
                 LiquidGlassChip("Уведомление", draft.alertType == AlertType.NOTIFICATION) {
                     onDraftChange { it.copy(alertType = AlertType.NOTIFICATION) }
                 }
-                LiquidGlassChip("Будильник", draft.alertType == AlertType.ALARM) {
-                    onDraftChange { it.copy(alertType = AlertType.ALARM) }
+                LiquidGlassChip(
+                    label = if (isPro) "Будильник" else "Будильник · Pro",
+                    selected = draft.alertType == AlertType.ALARM
+                ) {
+                    if (isPro) {
+                        onDraftChange { it.copy(alertType = AlertType.ALARM) }
+                    } else {
+                        onOpenPaywall()
+                    }
                 }
-                LiquidGlassChip("Оба", draft.alertType == AlertType.BOTH) {
-                    onDraftChange { it.copy(alertType = AlertType.BOTH) }
+                LiquidGlassChip(
+                    label = if (isPro) "Оба" else "Оба · Pro",
+                    selected = draft.alertType == AlertType.BOTH
+                ) {
+                    if (isPro) {
+                        onDraftChange { it.copy(alertType = AlertType.BOTH) }
+                    } else {
+                        onOpenPaywall()
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))

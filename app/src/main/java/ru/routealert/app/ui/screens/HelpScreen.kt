@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ru.routealert.app.data.ThemeMode
+import ru.routealert.app.subscription.SubscriptionState
+import ru.routealert.app.subscription.SubscriptionStatus
 import ru.routealert.app.ui.PermissionHints
 import ru.routealert.app.ui.theme.Glass
 import ru.routealert.app.ui.theme.LiquidGlassChip
@@ -36,8 +38,11 @@ fun HelpScreen(
     permissions: PermissionHints,
     themeMode: ThemeMode,
     isPro: Boolean,
+    subscriptionState: SubscriptionState? = null,
     onThemeMode: (ThemeMode) -> Unit,
     onSetPro: (Boolean) -> Unit,
+    onOpenPaywall: () -> Unit = {},
+    onResetTrial: () -> Unit = {},
     onOpenAppSettings: () -> Unit,
     onOpenBatterySettings: () -> Unit,
     onOpenLocationSettings: () -> Unit,
@@ -88,19 +93,28 @@ fun HelpScreen(
             }
         }
 
-        GlassSection(title = "Pro") {
+        GlassSection(title = "Подписка Pro") {
+            val statusText = when (val s = subscriptionState?.status) {
+                is SubscriptionStatus.TrialActive -> "Пробный период: осталось ${s.daysLeft} дн. (полный доступ Pro)"
+                is SubscriptionStatus.ProPurchased -> "Подписка активна (тариф: ${s.planId})"
+                is SubscriptionStatus.ExpiredFree -> "Базовая версия (только уведомления)"
+                null -> if (isPro) "Pro активен" else "Базовая версия"
+            }
+            HelpLine(statusText)
             HelpLine(
-                "Pro: шаринг точек ссылкой и QR (родители/дети). " +
-                    "Поиск адреса и live-уведомление в поездке доступны всем."
+                "В Pro входят: будильник при выключенном звуке, двойное оповещение и шаринг точек по QR/ссылкам."
             )
+            GlassActionButton("Управление подпиской / Тарифы", onOpenPaywall)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                LiquidGlassChip("Pro вкл", isPro) { onSetPro(true) }
-                LiquidGlassChip("Pro выкл", !isPro) { onSetPro(false) }
+                LiquidGlassChip("Pro вкл (тест)", isPro) { onSetPro(true) }
+                LiquidGlassChip("Pro выкл (тест)", !isPro) { onSetPro(false) }
+                LiquidGlassChip("Сбросить 7-дн триал", false) { onResetTrial() }
             }
         }
 

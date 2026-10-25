@@ -129,6 +129,11 @@ class MainActivity : ComponentActivity() {
                     onFocusDraftOnMap = vm::focusDraftOnMap,
                     onOpenShare = vm::openShare,
                     onCloseShare = vm::closeShare,
+                    onOpenPaywall = vm::openPaywall,
+                    onClosePaywall = vm::closePaywall,
+                    billingProvider = vm.subscriptionManager.billingProvider,
+                    onPurchaseSuccess = vm::onPurchaseSuccess,
+                    onResetTrial = vm::resetTrialForTesting,
                     onSetPro = vm::setPro,
                     onClearImportMessage = vm::clearImportMessage,
                     onImportText = vm::importFromText

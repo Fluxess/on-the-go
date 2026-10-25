@@ -44,6 +44,7 @@ import ru.routealert.app.ui.theme.LiquidGlassPanel
 fun SharePointsSheet(
     points: List<RoutePoint>,
     isPro: Boolean,
+    onOpenPaywall: () -> Unit = {},
     onImportFromText: (String) -> Unit = {},
     onDismiss: () -> Unit
 ) {
@@ -88,16 +89,33 @@ fun SharePointsSheet(
                     shape = RoundedCornerShape(20.dp),
                     colors = Glass.PanelFill
                 ) {
-                    Text(
-                        "Функция доступна в Pro. Включите Pro в разделе «Помощь» для теста.",
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(14.dp),
-                        textAlign = TextAlign.Center,
-                        color = Color.White.copy(alpha = 0.9f)
-                    )
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Функция обмена точками доступна в Pro.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            "Включите Pro в разделе «Помощь» или активируйте подписку.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.75f),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        LiquidGlassChip("Перейти к тарифам Pro", selected = true) {
+                            onOpenPaywall()
+                        }
+                    }
                 }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(14.dp))
                 LiquidGlassChip("Закрыть", selected = false, onClick = onDismiss)
                 return@Column
             }

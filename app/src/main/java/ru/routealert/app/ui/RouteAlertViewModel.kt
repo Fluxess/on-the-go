@@ -22,6 +22,10 @@ import ru.routealert.app.service.TripStateHolder
 import ru.routealert.app.service.TripUiState
 import ru.routealert.app.share.PointShare
 import ru.routealert.app.share.SharedPoint
+import ru.routealert.app.subscription.SubscriptionManager
+import ru.routealert.app.subscription.SubscriptionPlan
+import ru.routealert.app.subscription.SubscriptionState
+import ru.routealert.app.subscription.SubscriptionStatus
 
 data class PointDraft(
     val id: Long = 0,
@@ -56,8 +60,13 @@ data class RouteAlertUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val mapNightMode: Boolean = false,
     val isPro: Boolean = true,
+    val subscriptionState: SubscriptionState = SubscriptionState(
+        status = SubscriptionStatus.TrialActive(7, 0L),
+        isProUnlocked = true
+    ),
     val showSearch: Boolean = false,
     val showShare: Boolean = false,
+    val showPaywall: Boolean = false,
     val importMessage: String? = null,
     val mapFocus: MapFocusRequest? = null,
     val permissions: PermissionHints = PermissionHints()
@@ -65,13 +74,15 @@ data class RouteAlertUiState(
 
 class RouteAlertViewModel(
     private val pointsRepo: RoutePointRepository,
-    private val prefsRepo: PreferencesRepository
+    private val prefsRepo: PreferencesRepository,
+    val subscriptionManager: SubscriptionManager
 ) : ViewModel() {
 
     private val draft = MutableStateFlow<PointDraft?>(null)
     private val permissions = MutableStateFlow(PermissionHints())
     private val showSearch = MutableStateFlow(false)
     private val showShare = MutableStateFlow(false)
+    private val showPaywall = MutableStateFlow(false)
     private val importMessage = MutableStateFlow<String?>(null)
     private val mapFocus = MutableStateFlow<MapFocusRequest?>(null)
 
@@ -88,9 +99,9 @@ class RouteAlertViewModel(
         prefsRepo.defaultAlertType,
         prefsRepo.themeMode,
         prefsRepo.mapNightMode,
-        prefsRepo.isPro
-    ) { seen, type, theme, mapNight, pro ->
-        PrefBundle(seen, type, theme, mapNight, pro)
+        subscriptionManager.subscriptionState
+    ) { seen, type, theme, mapNight, subState ->
+        Triple(PrefBundle(seen, type, theme, mapNight, subState.isProUnlocked), subState, Unit)
     }
 
     val uiState: StateFlow<RouteAlertUiState> = combine(
@@ -100,15 +111,16 @@ class RouteAlertViewModel(
             draft,
             prefsFlow,
             permissions
-        ) { points, trip, draftValue, prefs, perm ->
-            Triple(Triple(points, trip, draftValue), prefs, perm)
+        ) { points, trip, draftValue, (prefBundle, subState), perm ->
+            Triple(Triple(points, trip, draftValue), prefBundle to subState, perm)
         },
-        combine(showSearch, showShare, importMessage, mapFocus) { search, share, msg, focus ->
-            UiFlags(search, share, msg, focus)
+        combine(showSearch, showShare, showPaywall, importMessage, mapFocus) { search, share, paywall, msg, focus ->
+            UiFlags(search, share, paywall, msg, focus)
         }
     ) { core, flags ->
-        val (bundle, prefs, perm) = core
+        val (bundle, prefAndSub, perm) = core
         val (points, trip, draftValue) = bundle
+        val (prefs, subState) = prefAndSub
         RouteAlertUiState(
             points = points,
             trip = trip,
@@ -117,9 +129,11 @@ class RouteAlertViewModel(
             defaultAlertType = prefs.defaultAlert,
             themeMode = prefs.themeMode,
             mapNightMode = prefs.mapNightMode,
-            isPro = prefs.isPro,
+            isPro = subState.isProUnlocked,
+            subscriptionState = subState,
             showSearch = flags.showSearch,
             showShare = flags.showShare,
+            showPaywall = flags.showPaywall,
             importMessage = flags.importMessage,
             mapFocus = flags.mapFocus,
             permissions = perm
@@ -129,6 +143,7 @@ class RouteAlertViewModel(
     private data class UiFlags(
         val showSearch: Boolean,
         val showShare: Boolean,
+        val showPaywall: Boolean,
         val importMessage: String?,
         val mapFocus: MapFocusRequest?
     )
@@ -251,7 +266,32 @@ class RouteAlertViewModel(
     }
 
     fun setPro(enabled: Boolean) {
-        viewModelScope.launch { prefsRepo.setPro(enabled) }
+        viewModelScope.launch {
+            subscriptionManager.setProDirectly(enabled)
+            prefsRepo.setPro(enabled)
+        }
+    }
+
+    fun openPaywall() {
+        showPaywall.value = true
+    }
+
+    fun closePaywall() {
+        showPaywall.value = false
+    }
+
+    fun onPurchaseSuccess(plan: SubscriptionPlan) {
+        viewModelScope.launch {
+            subscriptionManager.activatePlan(plan)
+            prefsRepo.setPro(true)
+        }
+    }
+
+    fun resetTrialForTesting() {
+        viewModelScope.launch {
+            subscriptionManager.resetTrialForTesting()
+            prefsRepo.setPro(true)
+        }
     }
 
     fun openSearch() {
@@ -329,7 +369,8 @@ class RouteAlertViewModel(
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return RouteAlertViewModel(
                         RoutePointRepository.get(app),
-                        PreferencesRepository.get(app)
+                        PreferencesRepository.get(app),
+                        SubscriptionManager.get(app)
                     ) as T
                 }
             }
