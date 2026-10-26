@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.routealert.app.analytics.AnalyticsManager
+import ru.routealert.app.analytics.AppAnalyticsData
 import ru.routealert.app.data.AlertType
 import ru.routealert.app.data.PreferencesRepository
 import ru.routealert.app.data.RoutePoint
@@ -67,6 +69,8 @@ data class RouteAlertUiState(
     val showSearch: Boolean = false,
     val showShare: Boolean = false,
     val showPaywall: Boolean = false,
+    val showSecretAdmin: Boolean = false,
+    val analytics: AppAnalyticsData = AppAnalyticsData(0, 0L, 0L, 0, 0, 0, 0, 0, 0, "Нет"),
     val importMessage: String? = null,
     val mapFocus: MapFocusRequest? = null,
     val permissions: PermissionHints = PermissionHints()
@@ -75,7 +79,8 @@ data class RouteAlertUiState(
 class RouteAlertViewModel(
     private val pointsRepo: RoutePointRepository,
     private val prefsRepo: PreferencesRepository,
-    val subscriptionManager: SubscriptionManager
+    val subscriptionManager: SubscriptionManager,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val draft = MutableStateFlow<PointDraft?>(null)
@@ -83,8 +88,15 @@ class RouteAlertViewModel(
     private val showSearch = MutableStateFlow(false)
     private val showShare = MutableStateFlow(false)
     private val showPaywall = MutableStateFlow(false)
+    private val showSecretAdmin = MutableStateFlow(false)
     private val importMessage = MutableStateFlow<String?>(null)
     private val mapFocus = MutableStateFlow<MapFocusRequest?>(null)
+
+    init {
+        viewModelScope.launch {
+            analyticsManager.trackAppLaunch()
+        }
+    }
 
     private data class PrefBundle(
         val helpSeen: Boolean,
@@ -114,8 +126,12 @@ class RouteAlertViewModel(
         ) { points, trip, draftValue, (prefBundle, subState), perm ->
             Triple(Triple(points, trip, draftValue), prefBundle to subState, perm)
         },
-        combine(showSearch, showShare, showPaywall, importMessage, mapFocus) { search, share, paywall, msg, focus ->
-            UiFlags(search, share, paywall, msg, focus)
+        combine(
+            combine(showSearch, showShare, showPaywall) { s, sh, p -> Triple(s, sh, p) },
+            combine(showSecretAdmin, importMessage, mapFocus) { sa, msg, f -> Triple(sa, msg, f) },
+            analyticsManager.analyticsFlow
+        ) { (search, share, paywall), (secretAdmin, msg, focus), analytics ->
+            UiFlags(search, share, paywall, secretAdmin, msg, focus, analytics)
         }
     ) { core, flags ->
         val (bundle, prefAndSub, perm) = core
@@ -134,6 +150,8 @@ class RouteAlertViewModel(
             showSearch = flags.showSearch,
             showShare = flags.showShare,
             showPaywall = flags.showPaywall,
+            showSecretAdmin = flags.showSecretAdmin,
+            analytics = flags.analytics,
             importMessage = flags.importMessage,
             mapFocus = flags.mapFocus,
             permissions = perm
@@ -144,8 +162,10 @@ class RouteAlertViewModel(
         val showSearch: Boolean,
         val showShare: Boolean,
         val showPaywall: Boolean,
+        val showSecretAdmin: Boolean,
         val importMessage: String?,
-        val mapFocus: MapFocusRequest?
+        val mapFocus: MapFocusRequest?,
+        val analytics: AppAnalyticsData
     )
 
     fun prepareNewPoint(lat: Double, lon: Double) {
@@ -228,6 +248,9 @@ class RouteAlertViewModel(
                     enabled = current.enabled
                 )
             )
+            if (current.isNew) {
+                analyticsManager.trackPointCreated()
+            }
             prefsRepo.setDefaultAlertType(current.alertType)
             draft.value = null
         }
@@ -274,16 +297,34 @@ class RouteAlertViewModel(
 
     fun openPaywall() {
         showPaywall.value = true
+        viewModelScope.launch {
+            analyticsManager.trackPaywallView()
+        }
     }
 
     fun closePaywall() {
         showPaywall.value = false
     }
 
+    fun openSecretAdmin() {
+        showSecretAdmin.value = true
+    }
+
+    fun closeSecretAdmin() {
+        showSecretAdmin.value = false
+    }
+
+    fun resetAnalytics() {
+        viewModelScope.launch {
+            analyticsManager.resetStats()
+        }
+    }
+
     fun onPurchaseSuccess(plan: SubscriptionPlan) {
         viewModelScope.launch {
             subscriptionManager.activatePlan(plan)
             prefsRepo.setPro(true)
+            analyticsManager.trackPurchase(plan.id)
         }
     }
 
@@ -304,6 +345,9 @@ class RouteAlertViewModel(
 
     fun openShare() {
         showShare.value = true
+        viewModelScope.launch {
+            analyticsManager.trackShare()
+        }
     }
 
     fun closeShare() {
@@ -370,7 +414,8 @@ class RouteAlertViewModel(
                     return RouteAlertViewModel(
                         RoutePointRepository.get(app),
                         PreferencesRepository.get(app),
-                        SubscriptionManager.get(app)
+                        SubscriptionManager.get(app),
+                        AnalyticsManager.get(app)
                     ) as T
                 }
             }

@@ -42,6 +42,7 @@ import ru.routealert.app.ui.screens.PaywallSheet
 import ru.routealert.app.ui.screens.PointEditorSheet
 import ru.routealert.app.ui.screens.PointsListScreen
 import ru.routealert.app.ui.screens.SearchPlaceSheet
+import ru.routealert.app.ui.screens.SecretAdminStatsSheet
 import ru.routealert.app.ui.screens.SharePointsSheet
 import ru.routealert.app.ui.theme.Glass
 import ru.routealert.app.ui.theme.LiquidGlassPanel
@@ -76,6 +77,9 @@ fun RouteAlertAppRoot(
     onCloseShare: () -> Unit,
     onOpenPaywall: () -> Unit = {},
     onClosePaywall: () -> Unit = {},
+    onOpenSecretAdmin: () -> Unit = {},
+    onCloseSecretAdmin: () -> Unit = {},
+    onResetAnalytics: () -> Unit = {},
     billingProvider: BillingProvider? = null,
     onPurchaseSuccess: (SubscriptionPlan) -> Unit = {},
     onResetTrial: () -> Unit = {},
@@ -162,7 +166,8 @@ fun RouteAlertAppRoot(
             AboutScreen(
                 onBack = { showingAbout = false },
                 onOpenPrivacy = { showingLegalDoc = "privacy" },
-                onOpenTerms = { showingLegalDoc = "terms" }
+                onOpenTerms = { showingLegalDoc = "terms" },
+                onOpenSecretAdmin = onOpenSecretAdmin
             )
         }
 
@@ -237,6 +242,18 @@ fun RouteAlertAppRoot(
             billingProvider = billingProvider,
             onSuccessPurchase = onPurchaseSuccess,
             onDismiss = onClosePaywall
+        )
+    }
+
+    if (uiState.showSecretAdmin) {
+        SecretAdminStatsSheet(
+            analytics = uiState.analytics,
+            subscriptionState = uiState.subscriptionState,
+            points = uiState.points,
+            onResetStats = onResetAnalytics,
+            onToggleProTest = onSetPro,
+            onResetTrialTest = onResetTrial,
+            onDismiss = onCloseSecretAdmin
         )
     }
 

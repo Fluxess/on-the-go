@@ -28,7 +28,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,10 +51,12 @@ import ru.routealert.app.ui.theme.liquidGlass
 fun AboutScreen(
     onBack: () -> Unit,
     onOpenPrivacy: () -> Unit,
-    onOpenTerms: () -> Unit
+    onOpenTerms: () -> Unit,
+    onOpenSecretAdmin: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
+    var versionTapCount by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -118,6 +123,13 @@ fun AboutScreen(
                 )
                 Text(
                     "Версия ${LegalDocs.APP_VERSION}",
+                    modifier = Modifier.clickable {
+                        versionTapCount++
+                        if (versionTapCount >= 5) {
+                            versionTapCount = 0
+                            onOpenSecretAdmin()
+                        }
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.onSurface.copy(alpha = 0.6f)
                 )

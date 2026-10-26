@@ -71,6 +71,9 @@ class TripTrackingService : Service() {
         }
 
         TripStateHolder.update { it.copy(isActive = true) }
+        scope.launch {
+            ru.routealert.app.analytics.AnalyticsManager.get(this@TripTrackingService).trackTripStarted()
+        }
         observePoints()
         startLocationUpdates()
         return START_STICKY
@@ -136,6 +139,9 @@ class TripTrackingService : Service() {
             triggeredThisSession.add(point.id)
             val distance = GeoUtils.distanceMeters(lat, lon, point.latitude, point.longitude)
             notifications.notifyPointReached(point, distance)
+            scope.launch {
+                ru.routealert.app.analytics.AnalyticsManager.get(this@TripTrackingService).trackAlertTriggered()
+            }
         }
     }
 
