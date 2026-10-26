@@ -5,7 +5,7 @@ object LegalDocs {
     const val TELEGRAM_HANDLE = "@pmellony"
     const val TELEGRAM_URL = "https://t.me/pmellony"
     const val SUPPORT_EMAIL = "support@routealert.ru"
-    const val APP_VERSION = "1.0.0"
+    const val APP_VERSION = "1.0.1"
 
     val PRIVACY_POLICY = """
 # Политика конфиденциальности — on-the-go
