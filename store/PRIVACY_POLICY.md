@@ -2,7 +2,7 @@
 
 **Дата обновления:** 20 октября 2026 г.  
 **Разработчик / оператор:** владелец приложения on-the-go (package `ru.routealert.app`)  
-**Контакты:** Telegram: `@pmellony` | Email: `support@routealert.ru`
+**Контакты:** Telegram: `@huntsvr` | Email: `dflux@internet.ru`
 
 ## 1. Общие сведения
 
