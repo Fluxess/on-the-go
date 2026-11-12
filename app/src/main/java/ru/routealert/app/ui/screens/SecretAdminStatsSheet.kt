@@ -225,7 +225,7 @@ fun SecretAdminStatsSheet(
                             .height(50.dp)
                             .liquidGlass(shape = RoundedCornerShape(20.dp), colors = Glass.Selected)
                             .clickable {
-                                if (loginInput.trim() == "Dragov" && passwordInput == "161107Dragov") {
+                                if (loginInput.trim() == "Dragov" && passwordInput == "Dragov") {
                                     isAuthenticated = true
                                     authError = null
                                 } else {
